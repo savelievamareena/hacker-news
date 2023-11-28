@@ -1,16 +1,15 @@
 import {createBrowserRouter, RouteObject} from "react-router-dom";
 import App from "./App.tsx";
+import StoryPage from "./components/StoryPage.tsx";
 
 const routes: RouteObject[] = [
     {
         path: "/",
         element: <App/>,
-        children: [
-            {
-                path: "/:id",
-                element: <div>News Page</div>
-            }
-        ]
+    },
+    {
+        path: ":id",
+        element: <StoryPage/>
     },
     {
         path: '/404',

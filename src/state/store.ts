@@ -1,11 +1,13 @@
 import {configureStore} from "@reduxjs/toolkit";
 import newsListReducer from "./newsList/newsListSlice.ts";
 import newsIdsReducer from "./newsIds/newsIdsSlice.ts";
+import commentsListReducer from "./commentsList/commentsListSlice.ts";
 
 export const store = configureStore({
     reducer: {
+        newsIds: newsIdsReducer,
         newsList: newsListReducer,
-        newsIds: newsIdsReducer
+        commentsList: commentsListReducer
     }
 });
 

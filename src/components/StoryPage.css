@@ -1,0 +1,25 @@
+.story_wrapper_full {
+    display: flex;
+    flex-direction: column;
+    width: 800px;
+}
+
+.story_wrapper_full:nth-child(2n) {
+    background-color: lightgrey;
+}
+
+.story_wrapper_full a {
+    color: black;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.publication_date {
+    align-self: flex-end;
+}
+
+.comment_wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 6px 0;
+}

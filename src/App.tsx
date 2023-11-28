@@ -4,14 +4,12 @@ import {AppDispatch, RootState} from "./state/store.ts";
 import {getNewsList} from "./state/newsList/newsListSlice.ts"
 import {getNewsIds} from "./state/newsIds/newsIdsSlice.ts";
 import './App.css'
+import {Link} from "react-router-dom";
+import getPublicationDate from "./helpers/dateHelper.ts";
 
-function App() {
+export default function App() {
     const newsIds = useSelector((state: RootState) => state.newsIds.data);
-    console.log(newsIds)
-    const newsList = useSelector((state: RootState) => {
-        console.log("STATE:", state);
-        return state.newsList.data
-    });
+    const newsList = useSelector((state: RootState) => state.newsList.data);
     const dispatch = useDispatch<AppDispatch>();
 
     React.useEffect(() => {
@@ -19,30 +17,38 @@ function App() {
     }, [dispatch]);
 
     React.useEffect(() => {
-        // Ensure newsIds is not empty
         if (newsIds.length > 0) {
             dispatch(getNewsList(newsIds));
         }
-    }, [newsIds]);
+    },[newsIds, dispatch]);
+
+    function handleUpdateFeed() {
+        dispatch(getNewsIds());
+    }
 
     const newsEls = newsList.map((oneNew, i) => {
+        const pubDate = getPublicationDate(oneNew.time);
+        const href = "/" + oneNew.id;
         return(
-            <div key={i}>
-                <div>{oneNew?.title}</div>
-                <div>{oneNew?.by}</div>
-            </div>
+            <Link key={i} to={href} state={oneNew}>
+                <div className="story_wrapper">
+                    <div className="story_title">{oneNew?.title}</div>
+                    <div>{oneNew?.by}</div>
+                    <div>Score: {oneNew?.score}</div>
+                    <div>{pubDate}</div>
+                </div>
+            </Link>
         )
     })
 
     return (
-        <div>
-            <button type="button" onClick={()=>{dispatch(getNewsList(newsIds))}}>Refresh News List</button>
+        <div className="main_content_wrapper">
             <div>
-                {newsEls}
+                {newsList.length > 0 ? newsEls : "Loading..."}
             </div>
-
+            <div className="button_container">
+                <button type="button" onClick={()=>{handleUpdateFeed()}}>Refresh News List</button>
+            </div>
         </div>
     )
 }
-
-export default App
