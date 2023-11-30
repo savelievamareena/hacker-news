@@ -17,9 +17,7 @@ export default function App() {
     }, [dispatch]);
 
     React.useEffect(() => {
-        if (newsIds.length > 0) {
-            dispatch(getNewsList(newsIds));
-        }
+        dispatch(getNewsList(newsIds));
     },[newsIds, dispatch]);
 
     function handleUpdateFeed() {
@@ -30,25 +28,26 @@ export default function App() {
         const pubDate = getPublicationDate(oneNew.time);
         const href = "/" + oneNew.id;
         return(
-            <Link key={i} to={href} state={oneNew}>
-                <div className="story_wrapper">
-                    <div className="story_title">{oneNew?.title}</div>
-                    <div>{oneNew?.by}</div>
-                    <div>Score: {oneNew?.score}</div>
-                    <div>{pubDate}</div>
-                </div>
-            </Link>
+            <div className="left_column" key={i}>
+                <Link to={href} state={oneNew}>
+                    <div className="story_wrapper">
+                        <div className="story_title">{oneNew?.title}</div>
+                        <div className="publication_date">{oneNew?.by}, {pubDate}</div>
+                        <div>Score: {oneNew?.score}</div>
+                        <div className="publication_date">Comments: {oneNew.descendants}</div>
+                    </div>
+                </Link>
+            </div>
+
         )
     })
 
     return (
         <div className="main_content_wrapper">
-            <div>
-                {newsList.length > 0 ? newsEls : "Loading..."}
-            </div>
             <div className="button_container">
                 <button type="button" onClick={()=>{handleUpdateFeed()}}>Refresh News List</button>
             </div>
+            {newsList.length > 0 ? newsEls : <div className="left_column">Loading...</div>}
         </div>
     )
 }
