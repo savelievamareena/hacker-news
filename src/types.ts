@@ -6,7 +6,7 @@ export interface NewsObj {
     by: string,
     descendants: number,
     id: number,
-    kids: number[] | null,
+    kids: number[] | undefined,
     score: number,
     time: number,
     title: string,

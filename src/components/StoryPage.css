@@ -39,6 +39,11 @@
     margin-top: 10px;
 }
 
+.refresh_comments_button_wrapper {
+    text-align: right;
+    margin-top: 10px;
+}
+
 .replies_wrapper {
     margin-left: 100px;
     display: flex;

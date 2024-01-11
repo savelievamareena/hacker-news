@@ -12,17 +12,27 @@ export default function App() {
     const newsList = useSelector((state: RootState) => state.newsList.data);
     const dispatch = useDispatch<AppDispatch>();
 
-    React.useEffect(() => {
+    function handleUpdateFeed() {
         dispatch(getNewsIds());
-    }, [dispatch]);
+    }
+
+    React.useEffect(() => {
+        handleUpdateFeed();
+    },[dispatch]);
+
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            console.log("interval:", interval, Date.now());
+            handleUpdateFeed();
+        }, 60000);
+        return () => {
+            clearInterval(interval)
+        };
+    },[dispatch])
 
     React.useEffect(() => {
         dispatch(getNewsList(newsIds));
     },[newsIds, dispatch]);
-
-    function handleUpdateFeed() {
-        dispatch(getNewsIds());
-    }
 
     const newsEls = newsList.map((oneNew, i) => {
         const pubDate = getPublicationDate(oneNew.time);
@@ -45,7 +55,7 @@ export default function App() {
     return (
         <div className="main_content_wrapper">
             <div className="button_container">
-                <button type="button" onClick={()=>{handleUpdateFeed()}}>Refresh News List</button>
+                <button type="button" onClick={handleUpdateFeed}>Refresh News List</button>
             </div>
             {newsList.length > 0 ? newsEls : <div className="left_column">Loading...</div>}
         </div>
