@@ -1,6 +1,6 @@
 import React from "react";
 import "./StoryPage.css";
-import {useLocation, useNavigate } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import getPublicationDate from "../helpers/dateHelper.ts";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../state/store.ts";
@@ -17,24 +17,23 @@ export default function StoryPage() {
         navigate("/");
     }
 
-    const location = useLocation();
-    const initialStoryData: NewsObj = location.state;
+    const params = useParams();
+    const dispatch = useDispatch<AppDispatch>();
 
     const story: NewsObj = useSelector((state: RootState) => state.storyData);
-    console.log(story)
     const commentsList = useSelector((state: RootState) => state.commentsList.data);
     const commentsReplies = useSelector((state: RootState) => state.commentsReplies.data);
 
-    const dispatch = useDispatch<AppDispatch>();
-
-    //first load - updating the story state by location
+    //first load - updating the story state by story ID from params
     React.useEffect(() => {
-        dispatch(refreshStoryData(initialStoryData.id));
+        if(params.id) {
+            dispatch(refreshStoryData(parseInt(params.id)));
+        }
 
         return () => {
             dispatch(resetStoryData());
         }
-    }, [dispatch, initialStoryData.id])
+    }, [dispatch, params.id])
 
     //retrieving initial comments
     React.useEffect(() => {
@@ -44,7 +43,7 @@ export default function StoryPage() {
             dispatch(resetComments());
             dispatch(resetReplies())
         };
-    },[dispatch, story.id]);
+    },[dispatch, story.kids]);
 
     function refreshComments() {
         dispatch(refreshStoryData(story.id));
@@ -89,14 +88,14 @@ export default function StoryPage() {
         }
     })
 
-    const pubDate = getPublicationDate(initialStoryData.time);
+    const pubDate = getPublicationDate(story.time);
     return(
         <div className="story_wrapper_full">
-            <a href={initialStoryData.url}><h2>{initialStoryData.title}</h2></a>
-            <div className="publication_date">{pubDate}, {initialStoryData.by}</div>
+            <a href={story.url}><h2>{story.title}</h2></a>
+            <div className="publication_date">{pubDate}, {story.by}</div>
             <div className="line_block_comments">
                 <div>
-                    Comments: {initialStoryData.descendants}
+                    Comments: {story.descendants}
                 </div>
                 <button type="button" onClick={returnBack}>Return</button>
             </div>
@@ -107,6 +106,5 @@ export default function StoryPage() {
                 <button type="button" onClick={refreshComments}>Refresh</button>
             </div>
         </div>
-
     )
 }

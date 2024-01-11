@@ -1,7 +1,8 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {NewsObj} from "../../types.ts";
+import {fetchEntity} from "../../helpers/fetchCommentsHelper.ts";
 
-const initialState: NewsObj = {
+const createInitialState = (): NewsObj => ({
     by: "",
     id: 0,
     descendants: 0,
@@ -11,21 +12,14 @@ const initialState: NewsObj = {
     title: "",
     type: "",
     url: ""
-};
+});
+
+const initialState: NewsObj = createInitialState();
 
 export const refreshStoryData = createAsyncThunk(
     'story/refreshStoryData',
     async (id: number) => {
-        const urlAddress = `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
-        console.log(urlAddress)
-        return await fetch(urlAddress)
-            .then(response => response.json())
-            .then(data => {
-                if(typeof data === "object" && data.type === "story") {
-                    return data;
-                }
-                return null;
-            });
+        return await fetchEntity(id, "story");
     }
 );
 
@@ -33,19 +27,7 @@ const refreshStoryDataSlice = createSlice({
     name: "story",
     initialState,
     reducers: {
-        resetStoryData: () => {
-            return {
-                by: "",
-                id: 0,
-                descendants: 0,
-                kids: [],
-                score: 0,
-                time: 0,
-                title: "",
-                type: "",
-                url: ""
-            }
-        }
+        resetStoryData: createInitialState
     },
     extraReducers: (builder) => {
         builder.addCase(refreshStoryData.fulfilled, (_state, action) => {
