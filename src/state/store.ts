@@ -3,7 +3,8 @@ import newsListReducer from "./newsList/newsListSlice.ts";
 import newsIdsReducer from "./newsIds/newsIdsSlice.ts";
 import commentsListReducer from "./commentsList/commentsListSlice.ts";
 import commentsRepliesReducer from "./commentsReplies/commentsRepliesSlice.ts";
-import refreshStoryDataSlice from "./refreshStoryData/refreshStoryDataSlice.ts";
+import refreshStoryDataSlice from "./refreshData/refreshStoryDataSlice.ts";
+import refreshCommentsSlice from "./refreshData/refreshCommentsSlice.ts";
 
 export const store = configureStore({
     reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
         newsList: newsListReducer,
         commentsList: commentsListReducer,
         commentsReplies: commentsRepliesReducer,
-        storyData: refreshStoryDataSlice
+        storyData: refreshStoryDataSlice,
+        commentsIds: refreshCommentsSlice
     }
 });
 

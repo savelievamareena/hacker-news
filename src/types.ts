@@ -34,3 +34,8 @@ export interface CommentObj {
 export interface CommentsListState {
     data: CommentObj[];
 }
+
+export interface StoryKids {
+    data: number[],
+    status: "success" | "pending" | "error"
+}

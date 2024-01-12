@@ -7,8 +7,9 @@ import {AppDispatch, RootState} from "../state/store.ts";
 import {getCommentsList, resetComments} from "../state/commentsList/commentsListSlice.ts";
 import htmlDecode from "../helpers/decodeHelper.ts";
 import {getCommentsReplies, resetReplies} from "../state/commentsReplies/commentsRepliesSlice.ts";
-import {refreshStoryData, resetStoryData} from "../state/refreshStoryData/refreshStoryDataSlice.ts";
-import {NewsObj} from "../types.ts";
+import {refreshStoryData, resetStoryData} from "../state/refreshData/refreshStoryDataSlice.ts";
+import {NewsObj, StoryKids} from "../types.ts";
+import {refreshCommentsData, resetCommentsData} from "../state/refreshData/refreshCommentsSlice.ts";
 
 export default function StoryPage() {
     const navigate = useNavigate();
@@ -23,30 +24,34 @@ export default function StoryPage() {
     const story: NewsObj = useSelector((state: RootState) => state.storyData);
     const commentsList = useSelector((state: RootState) => state.commentsList.data);
     const commentsReplies = useSelector((state: RootState) => state.commentsReplies.data);
+    const storyKidsData: StoryKids = useSelector((state: RootState) => state.commentsIds)
 
     //first load - updating the story state by story ID from params
     React.useEffect(() => {
         if(params.id) {
             dispatch(refreshStoryData(parseInt(params.id)));
+            dispatch(refreshCommentsData(parseInt(params.id)));
         }
 
         return () => {
             dispatch(resetStoryData());
+            dispatch(resetCommentsData());
         }
     }, [dispatch, params.id])
 
     //retrieving initial comments
     React.useEffect(() => {
-        dispatch(getCommentsList(story.data.kids));
+        dispatch(getCommentsList(storyKidsData.data));
 
         return () => {
             dispatch(resetComments());
             dispatch(resetReplies())
         };
-    },[dispatch, story.data.kids]);
+    },[dispatch, storyKidsData.data]);
 
-    function refreshComments() {
-        dispatch(refreshStoryData(story.data.id));
+    //update comments ids on click
+    function refreshCommentsHandler() {
+        dispatch(refreshCommentsData(story.data.id));
     }
 
     function openCommentsHandler() {
@@ -99,10 +104,10 @@ export default function StoryPage() {
                     <button type="button" onClick={returnBack}>Return</button>
                 </div>
                 <div>
-                    {story.data.kids !== undefined && commentsList.length === 0 ? <div>Loading Comments...</div> : commentsEls}
+                    {storyKidsData.status !== "success" ? <div>Loading Comments...</div> : commentsEls}
                 </div>
                 <div className="refresh_comments_button_wrapper">
-                    <button type="button" onClick={refreshComments}>Refresh</button>
+                    <button type="button" onClick={refreshCommentsHandler}>Refresh</button>
                 </div>
             </div>
         ) : <div>Loading...</div>
