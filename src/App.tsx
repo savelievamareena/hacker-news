@@ -35,20 +35,19 @@ export default function App() {
     },[newsIds, dispatch]);
 
     const newsEls = newsList.map((oneNew, i) => {
-        const pubDate = getPublicationDate(oneNew.time);
-        const href = "/" + oneNew.id;
+        const pubDate = getPublicationDate(oneNew.data.time);
+        const href = "/" + oneNew.data.id;
         return(
             <div className="left_column" key={i}>
                 <Link to={href} state={oneNew}>
                     <div className="story_wrapper">
-                        <div className="story_title">{oneNew?.title}</div>
-                        <div className="publication_date">{oneNew?.by}, {pubDate}</div>
-                        <div>Score: {oneNew?.score}</div>
-                        <div className="publication_date">Comments: {oneNew.descendants}</div>
+                        <div className="story_title">{oneNew.data.title}</div>
+                        <div className="publication_date">{oneNew.data.by}, {pubDate}</div>
+                        <div>Score: {oneNew.data.score}</div>
+                        <div className="publication_date">Comments: {oneNew.data.descendants}</div>
                     </div>
                 </Link>
             </div>
-
         )
     })
 

@@ -37,20 +37,20 @@ export default function StoryPage() {
 
     //retrieving initial comments
     React.useEffect(() => {
-        dispatch(getCommentsList(story.kids));
+        dispatch(getCommentsList(story.data.kids));
 
         return () => {
             dispatch(resetComments());
             dispatch(resetReplies())
         };
-    },[dispatch, story.kids]);
+    },[dispatch, story.data.kids]);
 
     function refreshComments() {
-        dispatch(refreshStoryData(story.id));
+        dispatch(refreshStoryData(story.data.id));
     }
 
     function openCommentsHandler() {
-        dispatch(getCommentsReplies(story.kids));
+        dispatch(getCommentsReplies(story.data.kids));
     }
 
     function closeCommentsHandler() {
@@ -71,7 +71,7 @@ export default function StoryPage() {
         const buttonText = commentsReplies.length === 0 ? "Show replies" : "Hide";
         const clickHandler = commentsReplies.length === 0 ? openCommentsHandler : closeCommentsHandler;
 
-        if (story.kids !== undefined && story.kids.length > 0) {
+        if (story.data.kids !== undefined && story.data.kids.length > 0) {
             const pubDate = getPublicationDate(comment.time);
             return (
                 <div key={id} className="comment_wrapper">
@@ -88,23 +88,23 @@ export default function StoryPage() {
         }
     })
 
-    const pubDate = getPublicationDate(story.time);
+    const pubDate = getPublicationDate(story.data.time);
     return(
-        <div className="story_wrapper_full">
-            <a href={story.url}><h2>{story.title}</h2></a>
-            <div className="publication_date">{pubDate}, {story.by}</div>
-            <div className="line_block_comments">
-                <div>
-                    Comments: {story.descendants}
+        story.status === "success" ? (
+            <div className="story_wrapper_full">
+                <a href={story.data.url}><h2>{story.data.title}</h2></a>
+                <div className="publication_date">{pubDate}, {story.data.by}</div>
+                <div className="line_block_comments">
+                    <div>Comments: {story.data.descendants}</div>
+                    <button type="button" onClick={returnBack}>Return</button>
                 </div>
-                <button type="button" onClick={returnBack}>Return</button>
+                <div>
+                    {story.data.kids !== undefined && commentsList.length === 0 ? <div>Loading Comments...</div> : commentsEls}
+                </div>
+                <div className="refresh_comments_button_wrapper">
+                    <button type="button" onClick={refreshComments}>Refresh</button>
+                </div>
             </div>
-            <div>
-                {(story.kids !== undefined && commentsList.length === 0) ? <div>Loading Comments...</div>:  commentsEls}
-            </div>
-            <div className="refresh_comments_button_wrapper">
-                <button type="button" onClick={refreshComments}>Refresh</button>
-            </div>
-        </div>
+        ) : <div>Loading...</div>
     )
 }

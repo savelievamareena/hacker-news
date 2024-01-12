@@ -3,15 +3,18 @@ export interface NewsIdsState {
 }
 
 export interface NewsObj {
-    by: string,
-    descendants: number,
-    id: number,
-    kids: number[] | undefined,
-    score: number,
-    time: number,
-    title: string,
-    type: string,
-    url: string
+    data: {
+        by: string,
+        descendants: number,
+        id: number,
+        kids: number[] | undefined,
+        score: number,
+        time: number,
+        title: string,
+        type: string,
+        url: string
+    },
+    status: "success" | "pending" | "error"
 }
 
 export interface NewsListState {

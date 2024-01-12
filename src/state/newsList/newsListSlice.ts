@@ -1,5 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {NewsListState} from "../../types.ts";
+import {fetchEntity} from "../../helpers/fetchCommentsHelper.ts";
 
 const initialState: NewsListState = {
     data: [],
@@ -9,17 +10,8 @@ export const getNewsList = createAsyncThunk(
     'news/getNewsList',
     async (idsArray: number[]) => {
         const fetchPromises = idsArray.map(id => {
-            const urlAddress = `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
-            return fetch(urlAddress)
-                .then(response => response.json())
-                .then(data => {
-                    if(typeof data === "object" && data.type === "story") {
-                        return data;
-                    }
-                    return null;
-                });
+            return fetchEntity(id, "story");
         });
-
         return await Promise.all(fetchPromises);
     }
 );
@@ -31,10 +23,17 @@ const newsListSlice = createSlice({
 
     },
     extraReducers: (builder) => {
-        builder.addCase(getNewsList.fulfilled, (_state, action) => {
-            return ({
-                data: action.payload
-            });
+        builder.addCase(getNewsList.fulfilled, (state, action) => {
+            state = {
+                data: []
+            };
+            action.payload.map((story) => {
+                state.data.push({
+                    data: {...story},
+                    status: "success"
+                })
+            })
+            return state;
         });
     }
 })

@@ -3,15 +3,18 @@ import {NewsObj} from "../../types.ts";
 import {fetchEntity} from "../../helpers/fetchCommentsHelper.ts";
 
 const createInitialState = (): NewsObj => ({
-    by: "",
-    id: 0,
-    descendants: 0,
-    kids: [],
-    score: 0,
-    time: 0,
-    title: "",
-    type: "",
-    url: ""
+    data: {
+        by: "",
+        id: 0,
+        descendants: 0,
+        kids: [],
+        score: 0,
+        time: 0,
+        title: "",
+        type: "",
+        url: ""
+    },
+    status: "success"
 });
 
 const initialState: NewsObj = createInitialState();
@@ -30,9 +33,18 @@ const refreshStoryDataSlice = createSlice({
         resetStoryData: createInitialState
     },
     extraReducers: (builder) => {
-        builder.addCase(refreshStoryData.fulfilled, (_state, action) => {
-            return {...action.payload}
-        });
+        builder
+            .addCase(refreshStoryData.fulfilled,
+            (state, action) => {
+                state.data = {...action.payload};
+                state.status = "success";
+            }
+        )
+            .addCase(refreshStoryData.pending,
+            (state) => {
+                state.status = "pending";
+            }
+        );
     }
 })
 
