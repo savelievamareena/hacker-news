@@ -3,18 +3,24 @@ export interface NewsIdsState {
 }
 
 export interface NewsObj {
-    data: {
-        by: string,
-        descendants: number,
-        id: number,
-        kids: number[] | undefined,
-        score: number,
-        time: number,
-        title: string,
-        type: string,
-        url: string
-    },
+    data: StoryProps,
     status: "success" | "pending" | "error"
+}
+
+export interface StoryProps {
+    by: string,
+    descendants: number,
+    id: number,
+    kids: number[] | undefined,
+    score: number,
+    time: number,
+    title: string,
+    type: string,
+    url: string
+}
+
+export interface CommentsBlockProps {
+    story: StoryProps
 }
 
 export interface NewsListState {
