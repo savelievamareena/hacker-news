@@ -54,8 +54,8 @@ export default function StoryPage() {
         dispatch(refreshCommentsData(story.data.id));
     }
 
-    function openCommentsHandler() {
-        dispatch(getCommentsReplies(story.data.kids));
+    function openCommentsHandler(repliesIds: number[]) {
+        dispatch(getCommentsReplies(repliesIds));
     }
 
     function closeCommentsHandler() {
@@ -74,7 +74,11 @@ export default function StoryPage() {
 
     const commentsEls = commentsList.map((comment, id) => {
         const buttonText = commentsReplies.length === 0 ? "Show replies" : "Hide";
-        const clickHandler = commentsReplies.length === 0 ? openCommentsHandler : closeCommentsHandler;
+        let repliesIds: number[] = [];
+        if(comment.kids !== null) {
+            repliesIds = comment.kids;
+        }
+        const clickHandler = commentsReplies.length === 0 ? () => {openCommentsHandler(repliesIds)} : closeCommentsHandler;
 
         if (story.data.kids !== undefined && story.data.kids.length > 0) {
             const pubDate = getPublicationDate(comment.time);
@@ -94,13 +98,14 @@ export default function StoryPage() {
     })
 
     const pubDate = getPublicationDate(story.data.time);
+    const commentsNumber = story.data.kids ? story.data.kids.length : 0;
     return(
         story.status === "success" ? (
             <div className="story_wrapper_full">
                 <a href={story.data.url}><h2>{story.data.title}</h2></a>
                 <div className="publication_date">{pubDate}, {story.data.by}</div>
                 <div className="line_block_comments">
-                    <div>Comments: {story.data.descendants}</div>
+                    <div>Comments: {commentsNumber}</div>
                     <button type="button" onClick={returnBack}>Return</button>
                 </div>
                 <div>
