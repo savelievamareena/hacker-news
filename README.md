@@ -1,30 +1,58 @@
-# React + TypeScript + Vite
+# Hacker News Reader
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Hacker News client that lets you browse the latest stories, read comments, and expand reply threads — built with React, TypeScript, Redux Toolkit, and React Router v6.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Displays the 20 newest stories with score, author, and comment count
+- Auto-refreshes the story list every 60 seconds
+- Navigates to a story detail page with comments
+- Expand/collapse replies per comment (fetched on demand, cached after first load)
+- Refresh comments button to pull the latest thread
+- Responsive layout with sticky header
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+| Tool | Purpose |
+|---|---|
+| React 18 | UI |
+| TypeScript | Static typing throughout |
+| Redux Toolkit | Global state (news feed, story data, comments) |
+| React Router v6 | Client-side routing with nested layouts |
+| Vite | Dev server and bundler |
+| Hacker News Firebase API | Live data source |
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+```bash
+npm install
+npm run dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Vite will print the local URL in the terminal once the server starts.
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── Layout.tsx          # App shell — sticky header, page wrapper
+│   ├── StoryPage.tsx       # Story detail + comments page
+│   └── CommentsBlock.tsx   # Comment list with per-comment reply toggle
+├── state/
+│   ├── newsIds/            # Slice: fetches top 20 story IDs
+│   ├── newsList/           # Slice: fetches story data for each ID
+│   ├── commentsList/       # Slice: fetches top-level comments
+│   └── refreshData/        # Slices: refresh story + comments on demand
+├── helpers/
+│   ├── fetchCommentsHelper.ts  # Fetch wrapper for HN API items
+│   ├── dateHelper.ts           # Unix timestamp → readable date
+│   └── decodeHelper.ts         # HTML entity decoding for comment text
+└── types.ts                # Shared TypeScript interfaces
+```
+
+## Design decisions
+
+- Reply state lives in each `CommentItem` component (local `useState`) rather than Redux, since it's purely UI-local and does not need to be shared across the tree.
+- Comments are fetched in parallel with `Promise.all` to minimize wait time.
+- The auto-refresh interval uses `useCallback` so the effect dependency is stable and the interval is not recreated on every render.

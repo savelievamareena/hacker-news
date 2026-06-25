@@ -1,10 +1,9 @@
 import React from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "./state/store.ts";
-import {getNewsList} from "./state/newsList/newsListSlice.ts"
-import {getNewsIds} from "./state/newsIds/newsIdsSlice.ts";
-import './App.css'
-import {Link} from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { AppDispatch, RootState } from "./state/store.ts";
+import { getNewsList } from "./state/newsList/newsListSlice.ts";
+import { getNewsIds } from "./state/newsIds/newsIdsSlice.ts";
 import getPublicationDate from "./helpers/dateHelper.ts";
 
 export default function App() {
@@ -12,51 +11,55 @@ export default function App() {
     const newsList = useSelector((state: RootState) => state.newsList.data);
     const dispatch = useDispatch<AppDispatch>();
 
-    function handleUpdateFeed() {
+    const fetchIds = React.useCallback(() => {
         dispatch(getNewsIds());
-    }
+    }, [dispatch]);
 
     React.useEffect(() => {
-        handleUpdateFeed();
-    },[dispatch]);
+        fetchIds();
+    }, [fetchIds]);
 
     React.useEffect(() => {
-        const interval = setInterval(() => {
-            console.log("interval:", interval, Date.now());
-            handleUpdateFeed();
-        }, 60000);
-        return () => {
-            clearInterval(interval)
-        };
-    },[dispatch])
+        const interval = setInterval(fetchIds, 60000);
+        return () => clearInterval(interval);
+    }, [fetchIds]);
 
     React.useEffect(() => {
         dispatch(getNewsList(newsIds));
-    },[newsIds, dispatch]);
+    }, [newsIds, dispatch]);
 
-    const newsEls = newsList.map((oneNew, i) => {
-        const pubDate = getPublicationDate(oneNew.data.time);
-        const href = "/" + oneNew.data.id;
-        return(
-            <div className="left_column" key={i}>
-                <Link to={href} state={oneNew}>
-                    <div className="story_wrapper">
-                        <div className="story_title">{oneNew.data.title}</div>
-                        <div className="publication_date">{oneNew.data.by}, {pubDate}</div>
-                        <div>Score: {oneNew.data.score}</div>
-                        <div className="publication_date">Comments: {oneNew.data.descendants}</div>
-                    </div>
-                </Link>
-            </div>
-        )
-    })
+    if (newsList.length === 0) {
+        return <div className="loading-text">Loading stories…</div>;
+    }
 
     return (
-        <div className="main_content_wrapper">
-            <div className="button_container">
-                <button type="button" onClick={handleUpdateFeed}>Refresh News List</button>
+        <div>
+            <div className="news-controls">
+                <button className="btn" type="button" onClick={fetchIds}>
+                    Refresh
+                </button>
             </div>
-            {newsList.length > 0 ? newsEls : <div className="left_column">Loading...</div>}
+            <div className="news-list">
+                {newsList.map((item, i) => {
+                    const pubDate = getPublicationDate(item.data.time);
+                    return (
+                        <div className="news-item" key={item.data.id}>
+                            <div className="news-item__rank">{i + 1}.</div>
+                            <div className="news-item__body">
+                                <Link className="news-item__title" to={`/${item.data.id}`} state={item}>
+                                    {item.data.title}
+                                </Link>
+                                <div className="news-item__meta">
+                                    <span>{item.data.score} points</span>
+                                    <span>by {item.data.by}</span>
+                                    <span>{pubDate}</span>
+                                    <span>{item.data.descendants ?? 0} comments</span>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
-    )
+    );
 }

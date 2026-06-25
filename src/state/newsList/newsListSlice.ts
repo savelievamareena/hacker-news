@@ -27,12 +27,14 @@ const newsListSlice = createSlice({
             state = {
                 data: []
             };
-            action.payload.map((story) => {
-                state.data.push({
-                    data: {...story},
-                    status: "success"
-                })
-            })
+            action.payload.forEach((story) => {
+                if (story) {
+                    state.data.push({
+                        data: { ...story },
+                        status: "success",
+                    });
+                }
+            });
             return state;
         });
     }

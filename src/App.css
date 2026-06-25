@@ -1,100 +1,259 @@
-#root {
-    padding: 2rem;
-    width: 100%;
-}
+/* ── Header ─────────────────────────────────────────── */
 
-.main_content_wrapper {
+.app-header {
+    background-color: var(--color-accent);
+    padding: 0 16px;
+    height: 42px;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    margin: 20px;
+    align-items: center;
     gap: 10px;
-    width: 70%;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
-.story_wrapper {
-    padding: 10px;
-    border-bottom: 1px solid grey;
-    display: flex;
-    flex-direction: column;
-}
-
-.story_wrapper * {
-    color: black;
-}
-
-.button_container {
-    width: 200px;
-}
-
-.story_title {
+.app-header__logo {
+    background-color: white;
+    color: var(--color-accent);
     font-weight: 900;
+    font-size: 0.9rem;
+    padding: 2px 7px;
+    border-radius: 2px;
+    line-height: 1.4;
+    flex-shrink: 0;
 }
 
-.left_column {
-    width: 70%;
-}
-
-.story_wrapper_full {
-    display: flex;
-    flex-direction: column;
-    width: 70%;
-}
-
-.comment_wrapper:nth-child(2n) {
-    background-color: cadetblue;
-}
-
-.story_wrapper_full a {
+.app-header__name {
     color: black;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.app-header__name:hover {
     text-decoration: underline;
+}
+
+/* ── Page wrapper ────────────────────────────────────── */
+
+.page-content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+
+.btn {
+    border-radius: 6px;
+    border: 1.5px solid var(--color-accent);
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    font-family: inherit;
     cursor: pointer;
+    background: transparent;
+    color: var(--color-accent);
+    transition: background 0.15s, color 0.15s;
 }
 
-.publication_date {
+.btn:hover {
+    background-color: var(--color-accent);
+    color: white;
+}
+
+.btn:active {
+    background-color: var(--color-accent-dark);;
+    border-color: var(--color-accent-dark);
+    color: white;
+}
+
+.btn--sm {
+    padding: 3px 10px;
+    font-size: 0.76rem;
+}
+
+/* ── News list (home page) ───────────────────────────── */
+
+.news-controls {
+    margin-bottom: 16px;
+}
+
+.news-list {
     display: flex;
     flex-direction: column;
-    align-items: end;
 }
 
-.comment_wrapper {
+.news-item {
     display: flex;
-    flex-direction: column;
-    padding: 6px;
-    margin: 10px 0;
-    border: 1px solid grey;
+    padding: 10px 6px;
+    border-bottom: 1px solid var(--color-border);
+    gap: 10px;
+    transition: background 0.1s;
 }
 
-.comment_wrapper button {
-    width: 150px;
+.news-item:first-child {
+    border-top: 1px solid var(--color-border);
 }
 
-.line_block_comments {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-top: 10px;
+.news-item:hover {
+    background-color: rgba(255, 102, 0, 0.05);
 }
 
-.refresh_comments_button_wrapper {
+.news-item__rank {
+    color: var(--color-text-muted);
+    min-width: 22px;
     text-align: right;
-    margin-top: 10px;
+    padding-top: 2px;
+    font-size: 0.82rem;
+    flex-shrink: 0;
 }
 
-.replies_wrapper {
-    margin-left: 100px;
-    display: flex;
-    flex-direction: column;
-    justify-content: right;
+.news-item__body {
+    flex: 1;
+    min-width: 0;
 }
 
-.reply_block {
+.news-item__title {
+    font-weight: 600;
+    font-size: 0.93rem;
+    line-height: 1.4;
+    color: var(--color-link);
+    display: block;
+}
+
+.news-item__title:hover {
+    text-decoration: underline;
+}
+
+.news-item__meta {
+    margin-top: 4px;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
     display: flex;
-    flex-direction: column;
-    justify-self: right;
-    padding: 6px;
-    border-left: 1px solid grey;
-    border-top: 1px solid grey;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ── Story page ──────────────────────────────────────── */
+
+.story-header {
+    margin-bottom: 20px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
     border-radius: 8px;
-    margin: 6px;
+    padding: 16px 20px;
+}
+
+.story-header__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+}
+
+.story-header__title a {
+    color: var(--color-link);
+}
+
+.story-header__title a:hover {
+    text-decoration: underline;
+}
+
+.story-header__meta {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.story-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.story-actions__label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+/* ── Comments ────────────────────────────────────────── */
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-item {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 14px;
+    background-color: var(--color-surface);
+}
+
+.comment-item__body {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--color-text);
+    word-break: break-word;
+}
+
+.comment-item__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.comment-item__author {
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+}
+
+.replies-list {
+    margin-top: 12px;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-left: 3px solid var(--color-accent);
+    padding-left: 12px;
+}
+
+.reply-item__body {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-text);
+    word-break: break-word;
+}
+
+.reply-item__author {
+    margin-top: 6px;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+}
+
+.reply-item + .reply-item {
+    border-top: 1px solid var(--color-border);
+    padding-top: 8px;
+}
+
+.comments-refresh {
+    text-align: right;
+    margin-top: 16px;
+}
+
+/* ── Loading / empty states ──────────────────────────── */
+
+.loading-text {
+    color: var(--color-text-muted);
+    padding: 32px 0;
+    text-align: center;
+    font-size: 0.9rem;
 }

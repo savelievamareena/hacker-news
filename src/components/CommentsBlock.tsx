@@ -1,85 +1,114 @@
 import React from "react";
-import {CommentsBlockProps, StoryKids} from "../types.ts";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../state/store.ts";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../state/store.ts";
+import { getCommentsList, resetComments } from "../state/commentsList/commentsListSlice.ts";
+import { refreshCommentsData } from "../state/refreshData/refreshCommentsSlice.ts";
+import { CommentsBlockProps, CommentObj, StoryKids } from "../types.ts";
+import fetchComments from "../helpers/fetchCommentsHelper.ts";
 import getPublicationDate from "../helpers/dateHelper.ts";
 import htmlDecode from "../helpers/decodeHelper.ts";
-import {getCommentsReplies, resetReplies} from "../state/commentsReplies/commentsRepliesSlice.ts";
-import {refreshCommentsData} from "../state/refreshData/refreshCommentsSlice.ts";
-import {getCommentsList, resetComments} from "../state/commentsList/commentsListSlice.ts";
 
-export default function CommentsBlock({story}: CommentsBlockProps ) {
+function CommentItem({ comment }: { comment: CommentObj }) {
+    const [replies, setReplies] = React.useState<CommentObj[]>([]);
+    const [isExpanded, setIsExpanded] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(false);
+
+    async function toggleReplies() {
+        if (isExpanded) {
+            setIsExpanded(false);
+            return;
+        }
+        if (replies.length > 0) {
+            setIsExpanded(true);
+            return;
+        }
+        setIsLoading(true);
+        const fetched = await fetchComments(comment.kids ?? []);
+        setReplies((fetched as (CommentObj | null)[]).filter(Boolean) as CommentObj[]);
+        setIsLoading(false);
+        setIsExpanded(true);
+    }
+
+    const hasReplies = comment.kids && comment.kids.length > 0;
+    const pubDate = getPublicationDate(comment.time);
+
+    return (
+        <div className="comment-item">
+            <div className="comment-item__body">{htmlDecode(comment.text)}</div>
+            <div className="comment-item__footer">
+                <span className="comment-item__author">
+                    {comment.by} · {pubDate}
+                </span>
+                {hasReplies && (
+                    <button className="btn btn--sm" type="button" onClick={toggleReplies}>
+                        {isLoading
+                            ? "Loading…"
+                            : isExpanded
+                            ? "Hide replies"
+                            : `Show replies (${comment.kids!.length})`}
+                    </button>
+                )}
+            </div>
+            {isExpanded && replies.length > 0 && (
+                <div className="replies-list">
+                    {replies.map((reply) => (
+                        <div key={reply.id} className="reply-item">
+                            <div className="reply-item__body">{htmlDecode(reply.text)}</div>
+                            <div className="reply-item__author">
+                                {reply.by} · {getPublicationDate(reply.time)}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default function CommentsBlock({ story }: CommentsBlockProps) {
     const dispatch = useDispatch<AppDispatch>();
-
     const commentsList = useSelector((state: RootState) => state.commentsList.data);
-    const commentsReplies = useSelector((state: RootState) => state.commentsReplies.data);
     const storyKidsData: StoryKids = useSelector((state: RootState) => state.commentsIds);
 
-    //retrieving initial comments
     React.useEffect(() => {
         dispatch(getCommentsList(storyKidsData.data));
-
         return () => {
             dispatch(resetComments());
-            dispatch(resetReplies())
         };
-    },[dispatch, storyKidsData.data]);
+    }, [dispatch, storyKidsData.data]);
 
-    function refreshCommentsHandler() {
-        dispatch(refreshCommentsData(story.id));
-    }
+    const isLoading =
+        storyKidsData.status === "pending" ||
+        (storyKidsData.status === "success" &&
+            storyKidsData.data.length > 0 &&
+            commentsList.length === 0);
+    const hasNoComments =
+        storyKidsData.status === "success" && storyKidsData.data.length === 0;
 
-    function openCommentsHandler(repliesIds: number[]) {
-        dispatch(getCommentsReplies(repliesIds));
-    }
-
-    function closeCommentsHandler() {
-        dispatch(resetReplies());
-    }
-
-    const repliesEls = commentsReplies.map((reply) => {
-        const pubDate = getPublicationDate(reply.time);
-        return(
-            <div key={reply.id} className="reply_block">
-                <div>{htmlDecode(reply.text)}</div>
-                <div className="publication_date">{reply.by}, {pubDate}</div>
-            </div>
-        )
-    })
-
-    const commentsEls = commentsList.map((comment) => {
-        const buttonText = commentsReplies.length === 0 ? "Show replies" : "Hide";
-        let repliesIds: number[] = [];
-        if(comment.kids !== null) {
-            repliesIds = comment.kids;
-        }
-        const clickHandler = commentsReplies.length === 0 ? () => {openCommentsHandler(repliesIds)} : closeCommentsHandler;
-
-        if (story.kids !== undefined && story.kids.length > 0) {
-            const pubDate = getPublicationDate(comment.time);
-            return (
-                <div key={comment.id} className="comment_wrapper">
-                    <div>{htmlDecode(comment.text)}</div>
-                    <div className="publication_date">
-                        <div>{comment.by}, {pubDate}</div>
-                        {comment.kids !== undefined ? <button type="button" onClick={clickHandler}>{buttonText}</button> : null}
-                    </div>
-                    <div className="replies_wrapper">
-                        {(comment.kids !== undefined && commentsReplies.length > 0) ? repliesEls : null}
-                    </div>
-                </div>
-            )
-        }
-    })
-
-    return(
+    return (
         <>
-            <div>
-                {storyKidsData.status === "success" && storyKidsData.data.length > 0 ? commentsEls : <div>Loading Comments...</div>}
+            <div className="comments-list">
+                {isLoading ? (
+                    <div className="loading-text">Loading comments…</div>
+                ) : hasNoComments ? (
+                    <div className="loading-text">No comments yet.</div>
+                ) : (
+                    (commentsList as (CommentObj | null)[])
+                        .filter(Boolean)
+                        .map((comment) => (
+                            <CommentItem key={(comment as CommentObj).id} comment={comment as CommentObj} />
+                        ))
+                )}
             </div>
-            <div className="refresh_comments_button_wrapper">
-                <button type="button" onClick={refreshCommentsHandler}>Refresh</button>
+            <div className="comments-refresh">
+                <button
+                    className="btn btn--sm"
+                    type="button"
+                    onClick={() => dispatch(refreshCommentsData(story.id))}
+                >
+                    Refresh comments
+                </button>
             </div>
         </>
-    )
+    );
 }
