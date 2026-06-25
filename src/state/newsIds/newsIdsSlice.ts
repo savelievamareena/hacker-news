@@ -6,10 +6,7 @@ export const getNewsIds = createAsyncThunk(
     async () => {
         const response = await fetch("https://hacker-news.firebaseio.com/v0/newstories.json");
         const data = await response.json();
-        if (data.length > 20) {
-            return data.slice(0, 20);
-        }
-        return [];
+        return data.slice(0, 20);
     }
 );
 
